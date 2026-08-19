@@ -1,0 +1,41 @@
+# Secrets and local authentication
+.env
+.env.*
+!.env.example
+**/cookies.txt
+**/cookies*.txt
+**/*.cookies
+**/*.cookie
+**/*token*
+**/*secret*
+
+# Python environments and caches
+.venv/
+venv/
+**/.venv/
+**/venv/
+__pycache__/
+**/__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Local media, transcripts, models, and runtime output
+output/
+outputs/
+downloads/
+subtitles/
+models/
+*.m4a
+*.mp3
+*.wav
+*.mp4
+*.webm
+*.srt
+*.vtt
+*.log
+
+# Editor and OS files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
