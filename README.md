@@ -31,7 +31,7 @@
 
 ## 安装方式
 
-在支持 Skills CLI 的 ChatGPT / Codex 环境中，用 `npx` 安装需要的 Skill：
+在支持 Skills CLI 的 ChatGPT / Codex / Claude 环境中，用 `npx` 安装需要的 Skill：
 
 ```bash
 npx skills add Andrew-liu/snow-skill -s snow-bilibili-summary -g
