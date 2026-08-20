@@ -1,11 +1,11 @@
 ---
 name: snow-x-article
-description: This skill should be used when writing, rewriting, researching, polishing, or packaging long-form X/Twitter articles in Markdown. It preserves the user's voice, supports research and citation management, applies a self-contained anti-AI-writing editorial pass, and produces a final X-ready long-form Markdown article. Trigger on “X长文”, “推特长文”, “写长文”, “改长文”, “重写文章”, “生成X长文”, or @command://snow-x-article.
+description: This skill should be used when writing, rewriting, researching, polishing, or packaging long-form X/Twitter articles in Markdown. It preserves the user's voice, supports research and citation management, applies a self-contained anti-AI-writing editorial pass, and produces a final Hexo-compatible long-form Markdown article. Trigger on "X长文", "推特长文", "写长文", "改长文", "重写文章", "生成X长文", or @command://snow-x-article.
 ---
 
 # Snow X Article
 
-Create publication-ready **X long-form articles**. Treat this as an editorial workflow, not a tweet/thread generator.
+Create publication-ready **long-form articles** in a single canonical format: Hexo-compatible Markdown that doubles as an X long-form source. Treat this as an editorial workflow, not a tweet/thread generator.
 
 Core promise:
 
@@ -13,21 +13,85 @@ Core promise:
 2. Research missing facts when needed and keep claims traceable.
 3. Convert notes, outlines, or thread-like drafts into natural long-form article paragraphs.
 4. Apply a self-contained anti-AI-writing pass before final delivery.
-5. Produce a clean X-ready Markdown article.
+5. Produce one clean Hexo-ready Markdown file. No alternative output formats.
 
-## Critical Default Rules
+## Canonical File Format (mandatory, the only format)
 
-When the user asks for a **long article / X long-form / Markdown article**:
+Every article file MUST follow this exact structure:
+
+```markdown
+---
+title: 文章标题（不写在正文里）
+date: YYYY-MM-DD 12:00:00
+tags: [标签1, 标签2, 标签3]
+---
+
+> 基于 / 实测机器 / 说明 等有读者价值的元信息（可选，逐行 blockquote）
+
+开场简介：1-4 个自然段，直接进入主题，兼作博客首页摘要。
+
+<!-- more -->
+
+## 01｜第一个章节标题
+
+正文自然段。
+
+## 02｜第二个章节标题
+
+正文自然段。
+
+---
+
+## 参考来源（可选）
+
+1. [公开可访问的引用](https://...)
+```
+
+Format rules, all mandatory:
+
+- **Front-matter**: `title` holds the article title. `date` is the writing day plus fixed time `12:00:00`. `tags` are 3-5 items the model derives from the topic, in `[a, b, c]` inline array form.
+- **No H1 in body**. The title lives only in front-matter. Never write `# 标题` in the body.
+- **No `## X 长文正文` or similar wrapper headings.**
+- **Opening intro** sits between front-matter (or the optional blockquote meta lines) and `<!-- more -->`. It is reader-facing prose, not a work note.
+- **`<!-- more -->` position is a hard rule**: always immediately before the first `## ` chapter heading. Never move it to tune excerpt length; fix the intro instead.
+- **Chapters are H2 with zero-padded numbering**: `## 01｜标题`, `## 02｜标题`. Use `###` only for rare sub-steps inside a chapter (installation steps, sub-cases). Never use `## 第一章｜` word-style numbering.
+- **References section is always named `## 参考来源`** (never 参考资料 / 参考链接), placed after a `---` divider at the end, optional.
+- **Images** use relative paths under the article directory's image folder (for `Obsidian/02-X/` that is `./image/xxx.png`). If a referenced image does not exist, comment the reference out with a `<!-- TODO: 配图缺失 ... -->` note instead of leaving a broken link.
+
+## Publicness Gate (mandatory final check)
+
+The body and 参考来源 MUST NOT contain:
+
+- drive-letter local paths (`D:/`, `G:/`, `C:\`, etc.)
+- local-only file names that are not publicly accessible (private logs, local notes)
+- private/internal source names, unless the user explicitly asks
+
+Resolution order: map the local reference to its public equivalent (e.g. `D:/UGit/mini-agent/agent.py` → `https://github.com/Andrew-liu/mini-agent/blob/master/agent.py`); if no public equivalent exists, delete the reference. Verify this gate line-by-line before final write.
+
+## Work Materials Go to Chat, Never to File
+
+Do NOT write any of these into the article file:
+
+- 标题备选 (alternative titles)
+- 可压缩成短推的版本 (short-tweet version)
+- 发布图片顺序 (image publishing order)
+- research notes, publishing notes, self-scores
+
+Instead, after the final file is written, output in the chat reply:
+
+1. **标题备选**: 3-5 alternative titles for the user to pick from.
+2. **可压缩成短推的版本**: a short-tweet compression of the article, ready to post.
+
+These are ephemeral working materials. The file stays clean.
+
+## Critical Writing Rules
 
 - Do **not** write in thread style unless explicitly requested.
 - Do **not** use one sentence per paragraph as the default.
 - Use natural article paragraphs: target 2-5 sentences per paragraph.
 - Keep short paragraphs only for emphasis, not as every line.
-- Separate reader-facing正文 from author notes / research notes / publishing notes.
-- Use level-2 headings (`## 01｜...`) for every reader-facing正文 section. Reserve `###` only for rare subsections or appendices when explicitly needed.
 - Preserve the user's first-person voice and informal style when present.
 - Avoid turning the article into a corporate report or academic paper unless explicitly requested.
-- Do not expose local/private source names in reader-facing正文 unless the user explicitly asks.
 
 Bad article layout:
 
@@ -61,8 +125,6 @@ If that path is not available, use the current workspace and report the path.
 
 ## Checkpoints
 
-Use explicit checkpoints for complex or destructive work.
-
 ### Checkpoint 1 — Outline Approval
 
 Stop and ask for confirmation before drafting the full article when:
@@ -71,6 +133,8 @@ Stop and ask for confirmation before drafting the full article when:
 - the topic is broad or research-heavy
 - the article structure is unclear
 - the output will be longer than 1,500 Chinese characters
+
+Include in the outline for approval: working `title`, `date`, proposed `tags`, chapter list.
 
 Skip this checkpoint only when the user explicitly asks to directly rewrite an existing file.
 
@@ -83,88 +147,37 @@ Before overwriting an existing Markdown file:
 3. If the rewrite changes more than formatting, state that the file will be overwritten.
 4. Keep a concise completion note after writing.
 
-If the user already gave a direct command like “覆盖 / 落地到这个文件 / 重写这个文件”, treat that as approval after reading the file.
+If the user already gave a direct command like "覆盖 / 落地到这个文件 / 重写这个文件", treat that as approval after reading the file.
 
 ## Three-Stage Workflow
 
 ### Stage 1 — Research, Outline, Voice, Citations
 
-1. Understand the writing project:
-   - topic
-   - main argument
-   - audience
-   - target format
-   - goal: educate / explain / persuade / entertain
-   - sources to use or avoid
-   - writing voice
-
-2. Build or refine an outline before rewriting:
-   - hook
-   - context
-   - main sections
-   - examples / evidence
-   - conclusion
-   - citation needs
-
+1. Understand the writing project: topic, main argument, audience, goal, sources to use or avoid, writing voice.
+2. Build or refine an outline before writing: hook, context, main sections, examples, conclusion, citation needs.
 3. Conduct research when needed:
    - use web search / web fetch for current facts
    - read user-provided local files when relevant
    - distinguish verified facts from personal interpretation
-   - avoid citing private/local sources in the reader-facing article unless the user asks
-
+   - never cite private/local sources in the reader-facing article
 4. Preserve author voice:
-   - keep first-person observations
-   - keep useful lived details
+   - keep first-person observations and lived details
    - keep rough-but-real phrasing when it improves authenticity
-   - improve clarity without replacing the user’s personality
-
+   - improve clarity without replacing the user's personality
 5. Manage citations:
-   - use light citations for X long-form
-   - add a short `参考来源` section when the article cites papers, web articles, reports, or factual claims that need traceability
-   - do not overload the article with academic-style inline citations unless requested
+   - use light citations; add `## 参考来源` only when the article cites papers, web articles, reports, or claims needing traceability
+   - every reference must pass the Publicness Gate
 
 ### Stage 2 — Anti-AI-Writing Editorial Pass
 
-Use this self-contained standard before final delivery.
+Mandatory checks before final delivery:
 
-Mandatory checks:
-
-1. Remove AI-like filler:
-   - “值得注意的是” when unnecessary
-   - “在当今快速变化的时代”
-   - “让我们深入探讨”
-   - generic opening politeness
-
-2. Break formulaic structures:
-   - forced three-part lists
-   - repeated “不是 X，而是 Y” patterns
-   - mechanical setup / reveal structures
-   - repeated “从 X 到 Y” framing when X/Y do not form a meaningful range
-
-3. Remove marketing / corporate tone:
-   - 赋能
-   - 至关重要
-   - 深刻变革
-   - 不断演变的格局
-   - 里程碑式
-   - 生态、闭环、抓手 when used as empty jargon
-
-4. Avoid dash spam:
-   - avoid `——` and overused `—`
-   - use commas, colons, periods, or paragraph breaks instead
-
-5. Improve paragraph rhythm:
-   - merge isolated one-line sentences into real paragraphs
-   - keep 1-line paragraphs only for deliberate emphasis
-   - mix short, medium, and long sentences
-   - use section headings to create structure, not excessive blank lines
-
-6. Preserve human voice:
-   - keep concrete details over generic summary
-   - keep uncertainty when the author is genuinely unsure
-   - keep first-person phrasing when it carries personality
-   - prefer authentic roughness over polished corporate prose
-
+1. Remove AI-like filler: "值得注意的是" when unnecessary, "在当今快速变化的时代", "让我们深入探讨", generic opening politeness.
+2. Break formulaic structures: forced three-part lists, repeated "不是 X，而是 Y" patterns, mechanical setup/reveal, meaningless "从 X 到 Y" framing.
+3. Remove marketing / corporate tone: 赋能、至关重要、深刻变革、不断演变的格局、里程碑式; 生态/闭环/抓手 as empty jargon.
+4. Avoid dash spam: avoid `——` and overused `—`; use commas, colons, periods, or paragraph breaks instead.
+5. Improve paragraph rhythm: merge isolated one-liners into real paragraphs; mix short, medium, long sentences; use headings for structure, not blank-line stacks.
+6. Preserve human voice: concrete details over generic summary; keep genuine uncertainty; prefer authentic roughness over polished corporate prose.
 7. Score the article after revision:
 
 | Dimension | Meaning | /10 |
@@ -175,108 +188,57 @@ Mandatory checks:
 | Human voice | sounds like a real person, not a generated essay | |
 | Concision | removes filler while keeping substance | |
 
-Gate:
+Gate: ≥45/50 ready; 40-44 polish once if easy; <40 revise before finalizing.
 
-- ≥45/50: ready for final review
-- 40-44/50: acceptable but polish once if easy
-- <40/50: revise before finalizing
+### Stage 3 — Final Review and Hexo-Ready Markdown
 
-### Stage 3 — Final Review and X-Ready Markdown
-
-Perform a final editorial review:
-
-1. Structure:
-   - hook works
-   - sections are ordered logically
-   - no work-in-progress notes are mixed into正文
-   - publishing notes are separated at the end
-
-2. Readability:
-   - paragraphs read like an article, not a thread
-   - no excessive blank-line stacking
-   - no long walls of text
-   - section titles are useful, not decorative
-
-3. Facts:
-   - key claims are sourced or framed as opinion
-   - uncertainties are marked
-   - private/local/internal sources are not exposed unless user asked
-
-4. Anti-AI-writing:
-   - run Stage 2 checks again after the final edit
-   - ensure titles, captions, and notes do not add AI-like phrasing
-
-5. Final file structure:
-
-```markdown
-# 标题
-
-> 用途 / 主题 / 日期 / 版本（可选）
-
-## X 长文正文
-
-## 01｜...
-
-正文自然段。
-
-## 02｜...
-
-正文自然段。
-
----
-
-## 参考来源（可选）
-
-1. ...
-
-## 标题备选（可选）
-
-1. ...
-
-## 可压缩成短推的版本（可选）
-
-...
-```
+1. Format compliance (all hard rules):
+   - front-matter present and complete (`title` / `date ... 12:00:00` / `tags`)
+   - no H1 in body, no wrapper headings
+   - `<!-- more -->` immediately before the first `## ` chapter
+   - chapters numbered `## 01｜` style
+   - references section (if any) named `## 参考来源` after `---`
+2. Publicness Gate: scan every line for local paths and private sources; map to public links or delete.
+3. Structure: hook works, sections ordered logically, no work notes mixed into正文.
+4. Readability: paragraphs read like an article, no walls of text, headings useful.
+5. Facts: key claims sourced or framed as opinion; uncertainties marked.
+6. Anti-AI-writing: re-run Stage 2 checks after the final edit.
+7. Write the file, then output 标题备选 and 短推版本 in chat (never in the file).
 
 ## When Editing an Existing Article
 
-When the user gives an existing Markdown file:
-
 1. Read the whole file first.
-2. Identify whether the current draft is:
-   - notes
-   - outline
-   - thread-like draft
-   - article draft
-   - publish-ready article
-3. If it is thread-like, convert it into article paragraphs.
-4. Preserve strong original lines.
-5. Move meta notes to appendices.
-6. Keep reader-facing正文 clean and complete.
-7. Write the final Markdown back to the file.
-8. Run lints or basic Markdown sanity checks when available.
+2. Identify the draft type: notes / outline / thread-like draft / article draft / publish-ready.
+3. **If the file is in a legacy format** (body H1 title, `> 主题/日期/用途` blockquote meta block, `## X 长文正文` wrapper, 标题备选 / 短推 / 发布图片顺序 blocks in file, `### 01｜` chapter levels, local paths in references), **migrate it to the canonical format automatically as part of the edit** — no separate permission needed:
+   - H1 → front-matter `title`; meta block dates → front-matter `date`; 主题 line → `tags`
+   - keep valuable meta lines (基于/实测机器/说明/版本) as blockquote lines under front-matter
+   - delete wrapper headings and work blocks (they move to chat if freshly useful, otherwise drop)
+   - promote `### NN｜` chapters to `## NN｜`; convert word-style chapter numbering to `01｜` style
+   - insert `<!-- more -->` before the first chapter
+   - fix image paths to the article's image folder convention; run the Publicness Gate
+4. If it is thread-like, convert it into article paragraphs.
+5. Preserve strong original lines.
+6. Write the final Markdown back to the file.
+7. Run basic Markdown sanity checks when available.
 
 ## When Creating a New Article
 
-When the user provides only a topic or rough notes:
-
 1. Draft a working title.
-2. Build an outline.
+2. Build an outline (Checkpoint 1 when applicable, including title/date/tags).
 3. Research missing facts.
-4. Write the article body.
+4. Write the article body in the canonical format.
 5. Apply the anti-AI-writing pass.
-6. Produce final Markdown.
+6. Final review, write file, deliver 标题备选 + 短推版本 in chat.
 
 ## Failure Modes & Fallbacks
-
-Encode failures explicitly. Do not silently skip a failed stage.
 
 | Trigger | First response | Final fallback |
 |---|---|---|
 | Target Markdown file does not exist | Search nearby paths by filename | Ask the user for the correct path; do not create a replacement unless asked |
 | User provides only rough notes and no title | Draft a working title from the thesis | Use `未命名_X长文.md` only if no usable title can be inferred |
-| Web research returns weak or conflicting sources | Mark the claim as unverified and avoid strong wording | Move the claim to author notes or remove it from正文 |
-| A local/private source informed the draft | Use it for context only | Do not expose local file names or private source names in reader-facing正文 unless requested |
+| Web research returns weak or conflicting sources | Mark the claim as unverified and avoid strong wording | Move the claim out of正文 or remove it |
+| A local/private source informed the draft | Use it for context only | Map to a public link or delete the reference; never expose local paths |
+| Referenced image file does not exist | Search the image folder for a matching file | Comment the reference out with a `<!-- TODO: 配图缺失 -->` note |
 | Outline is too broad | Split into 2-4 possible article angles | Trigger Checkpoint 1 and ask which angle to use |
 | Article reads like a thread | Merge sentence fragments into natural paragraphs | Re-run readability review before final write |
 | Anti-AI-writing score is <40/50 | Rewrite once using Stage 2 checks | Mark `needs human review` in completion note if still <40 |
@@ -286,12 +248,15 @@ Encode failures explicitly. Do not silently skip a failed stage.
 
 ## Anti-Patterns to Avoid
 
+- Writing the title as body H1 (it belongs in front-matter only).
+- Writing 标题备选 / 短推版本 / 发布图片顺序 into the article file.
+- Using `## X 长文正文` or any wrapper heading.
+- Moving `<!-- more -->` to tune excerpt length.
+- Leaving drive-letter paths or private source names anywhere in the file.
 - Turning every sentence into its own paragraph.
 - Mixing research notes with reader-facing正文.
-- Adding off-topic publishing materials that the user did not request.
-- Using generic AI phrases like “本文将深入探讨”.
-- Over-polishing the user’s voice into corporate prose.
-- Exposing local/private source names when the article should cite public sources only.
+- Using generic AI phrases like "本文将深入探讨".
+- Over-polishing the user's voice into corporate prose.
 - Treating X long-form as a tweet thread.
 
 ## Completion Report
@@ -300,9 +265,9 @@ After finishing, report briefly:
 
 ```text
 已完成：{file_path}
-- 文章排版：自然段 / X 长文
+- 格式：Hexo front-matter / more 标记 / H2 编号章节
+- 公开性门禁：{通过 / 处理了 N 处}
 - 去 AI 味：{score}/50
-- 检查：{lints / keyword scan / references}
 ```
 
-Keep the final chat response concise. The main deliverable is the Markdown file.
+Then provide in chat: 标题备选 (3-5) and 可压缩成短推的版本. Keep the final chat response concise. The main deliverable is the Markdown file.
