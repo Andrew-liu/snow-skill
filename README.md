@@ -28,6 +28,7 @@
 |---|---|---|
 | [`snow-bilibili-summary`](snow-bilibili-summary/) | B站视频搜索、字幕提取、评论抓取和结构化总结 | 自带脚本；需要 Python 运行环境 |
 | [`snow-x-article`](snow-x-article/) | X/Twitter 长文写作、改写、去 AI 味和 Markdown 输出 | 自包含版本；已去掉外部 Skill 依赖和配图流程 |
+| [`snow-ip`](snow-ip/) | 从照片创建个人 IP 角色，并用已确认角色生成文章插图 | 不包含原始图片资产；内置 `my-ip` 文字 reference |
 
 ## 安装方式
 
@@ -36,6 +37,7 @@
 ```bash
 npx skills add Andrew-liu/snow-skill -s snow-bilibili-summary -g
 npx skills add Andrew-liu/snow-skill -s snow-x-article -g
+npx skills add Andrew-liu/snow-skill -s snow-ip -g
 ```
 
 这个仓库包含多个 Skill，使用 `-s` 指定要安装的 Skill 名称；只需要其中一个时，运行对应那一行即可。
@@ -63,9 +65,15 @@ npx skills add Andrew-liu/snow-skill -s snow-x-article -g
 @command://snow-x-article 重写这篇文章，保留我的语气，去掉 AI 味 @/path/to/article.md
 ```
 
+### 个人 IP 插图
 
+```text
+@command://snow-ip 请根据我上传的照片创建“我的个人 IP”。
+```
 
-
+```text
+@command://snow-ip 用当前角色给这篇文章生成 3 张 16:9 正文插图。
+```
 
 ## License
 

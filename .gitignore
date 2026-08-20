@@ -25,6 +25,9 @@ outputs/
 downloads/
 subtitles/
 models/
+.snow-ip-assets/
+**/.snow-ip-assets/
+snow-ip/assets/
 *.m4a
 *.mp3
 *.wav
