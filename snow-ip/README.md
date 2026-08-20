@@ -93,4 +93,3 @@ references/my-ip-character-spec.md
 ## License
 
 MIT. This skill is adapted from the MIT-licensed workflow and code of `adrianpunk/punk-ip-illustrations`. Original bundled Punk character assets are not included in this `snow-ip` refactor.
-

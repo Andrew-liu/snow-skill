@@ -1,4 +1,4 @@
-﻿# 角色资产包与状态
+# 角色资产包与状态
 
 ## 目录
 
@@ -127,4 +127,3 @@ python3 scripts/character_registry.py list --root <runtime-root>
 2. 在 manifest 中记录该实际路径，或明确告知用户角色尚未完成注册。
 3. 不伪造目标文件已经写入。
 4. 未能形成完整角色包时，不把角色标记为 `confirmed`。
-
